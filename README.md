@@ -1,8 +1,8 @@
-# SGP — Sistema de Gestão de Pedidos (Signova Soluções Digitais)
+# SGP — Sistema de Gestão de Pedidos 
 
 API back-end para registrar e acompanhar vendas de certificado digital, substituindo o controle manual em planilha de uma operação real.
 
-> **Status:** em desenvolvimento. A modelagem das entidades está pronta; repository, service e controller são a próxima etapa.
+> **Status:** em desenvolvimento. Entidades e repositories estão prontos; tratamento de exceções, services e controllers são a próxima etapa.
 
 ## Sobre o projeto
 
@@ -10,9 +10,9 @@ A Signova Soluções Digitais, fundada por mim em 2023, vende certificados digit
 
 ## Fluxo de cadastro (visão de negócio)
 
-1. **Cliente:** nome completo, CPF, data de nascimento, e-mail e celular. Se o CPF já existe, o cliente é reaproveitado.
+1. **Cliente:** nome completo, CPF, data de nascimento, e-mail e celular. CPF e e-mail são únicos. Se o CPF já existe, o cliente é reaproveitado.
 2. **Tipo de certificado:** e-CPF ou e-CNPJ. Se for e-CNPJ, cadastra a empresa (CNPJ e razão social) ligada ao cliente.
-3. **Venda:** ponto de venda (Signova ou AKAT), parceiro, valor, forma de pagamento, tipo de atendimento, protocolo e pedido CCN. A venda nasce `PENDENTE` e depois vira `FINALIZADA` ou `CANCELADA`.
+3. **Venda:** ponto de venda (Signova ou AKAT), parceiro, data da venda, valor, forma de pagamento, tipo de atendimento, protocolo e pedido CCN. A venda nasce `PENDENTE` e depois vira `FINALIZADA` ou `CANCELADA`. Protocolo e pedido CCN são únicos e obrigatórios.
 
 ## Modelo de dados
 
@@ -29,6 +29,18 @@ Decisões de modelagem:
 - Valores monetários em `BigDecimal`.
 - Validação com Bean Validation (`@NotBlank`, `@Pattern`, `@Email`, `@NotNull`).
 - Abordagem *code-first*: o Hibernate gera as tabelas a partir das entidades.
+
+## Consultas disponíveis (repositories)
+
+Camada de acesso a dados com Spring Data JPA, sem SQL escrito à mão, exceto as somas:
+
+- **Cliente:** busca por CPF e por e-mail, busca parcial por nome (sem diferenciar maiúsculas), verificação de CPF e e-mail já cadastrados.
+- **Empresa:** busca e verificação por CNPJ, busca parcial por razão social, empresas de um cliente e contagem.
+- **Venda:**
+  - busca por protocolo Syngular e por pedido CCN, e verificação de duplicidade;
+  - listas por status, ponto de venda, parceiro, cliente, empresa e período, da data mais recente para a mais antiga e, no empate, do maior valor para o menor;
+  - contagens por parceiro, ponto de venda e período;
+  - soma do valor vendido no período, com ou sem filtro de status (consultas em JPQL com `@Query`).
 
 ## Stack
 
@@ -58,7 +70,8 @@ frontend/         # a ser criado
 
 - [x] Projeto Spring Boot conectado ao Oracle
 - [x] Entidades JPA: `Cliente`, `Empresa` e `Venda`, com relacionamentos e validações
-- [ ] Repositories (busca de cliente por CPF e de empresa por CNPJ)
+- [x] Repositories com buscas, contagens e somas por período
+- [ ] Tratamento de exceções (exceções de negócio e handler global com respostas HTTP padronizadas)
 - [ ] Services com as regras de cadastro
 - [ ] Controllers REST (CRUD de vendas) com `@Valid`, testados no Postman
 - [ ] Cadastro de parceiro como entidade própria
