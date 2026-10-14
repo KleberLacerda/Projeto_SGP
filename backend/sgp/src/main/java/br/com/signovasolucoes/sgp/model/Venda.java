@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 public class Venda {
@@ -11,6 +12,7 @@ public class Venda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Ponto AKAT OU SIGNOVA")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PontoVenda pontoVenda;
@@ -39,9 +41,13 @@ public class Venda {
     @Column(nullable = false)
     private FormaDePagamento formaDePagamento;
 
+    @NotNull(message = "Informe o tipo [VIDEO, ONLINE, PRESENCIAL].")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoDeAtendimento tipoDeAtendimento;
+
+    @NotNull(message = "Informa data da venda")
+    private LocalDate dataVenda;
 
     @NotBlank(message = "Informe o procotolo Syngular.")
     @Column(unique = true)
@@ -75,6 +81,14 @@ public class Venda {
 
     public Venda() {
 
+    }
+
+    public LocalDate getDataVenda() {
+        return dataVenda;
+    }
+
+    public void setDataVenda(LocalDate dataVenda) {
+        this.dataVenda = dataVenda;
     }
 
     public Long getId() {

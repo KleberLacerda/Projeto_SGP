@@ -1,6 +1,5 @@
 package br.com.signovasolucoes.sgp.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -29,6 +28,7 @@ public class Cliente {
 
     @NotBlank(message = "Informe o email.")
     @Email(message = "Email inválido.")
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String contaSyn;
